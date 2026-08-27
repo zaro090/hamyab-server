@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>همیاب - سرور اختصاصی</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.4/Vazirmatn-font-face.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Vazirmatn', sans-serif; background: #0b1220; color: #fff; height: 100vh; overflow: hidden; }
+        #map { height: 100vh; width: 100%; z-index: 1; }
+        #loginOverlay {
+            position: fixed; inset: 0; z-index: 1000;
+            display: flex; justify-content: center; align-items: center;
+            background: rgba(0,0,0,0.92); backdrop-filter: blur(20px);
+            padding: 24px;
+        }
+        .loginCard {
+            background: #1e293b; border-radius: 32px; padding: 40px 28px;
+            max-width: 380px; width: 100%; border: 1px solid #334155;
+            text-align: center;
+        }
+        .loginCard h1 { color: #f5c542; font-size: 2rem; margin-bottom: 4px; }
+        .loginCard p { color: #94a3b8; font-size: 0.9rem; margin-bottom: 24px; }
+        .loginCard input {
+            width: 100%; padding: 16px 20px; border-radius: 16px;
+            border: 1px solid #334155; background: #0f172a; color: #fff;
+            font-size: 1rem; font-family: inherit; margin-bottom: 16px; text-align: center;
+        }
+        .loginCard button {
+            width: 100%; padding: 16px;
+            background: #f5c542; color: #000; border: none;
+            border-radius: 50px; font-size: 1rem; font-weight: 700; cursor: pointer;
+        }
+        .controls {
+            position: fixed; right: 12px; bottom: 120px; z-index: 200;
+            display: flex; flex-direction: column; gap: 8px;
+        }
+        .controls button {
+            width: 48px; height: 48px; border-radius: 12px;
+            background: rgba(15,23,42,0.9); border: 1px solid #334155;
+            color: #fff; font-size: 1.2rem; cursor: pointer;
+        }
+        #usersPanel {
+            position: fixed; bottom: 20px; left: 12px; right: 12px; z-index: 100;
+            background: rgba(15,23,42,0.92); border: 1px solid #334155;
+            border-radius: 20px; padding: 12px 16px; backdrop-filter: blur(10px);
+            text-align: center; max-height: 140px; overflow-y: auto;
+        }
+        #usersList { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 6px; }
+        .user-chip {
+            background: #1e293b; padding: 3px 10px; border-radius: 16px;
+            font-size: 0.7rem; border: 1px solid #334155; cursor: pointer;
+        }
+        #toast {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: #1e293b; color: #f5c542; padding: 10px 20px;
+            border-radius: 30px; font-size: 0.8rem; z-index: 999;
+            display: none; border: 1px solid #f5c542;
+        }
+        .car-marker { background: transparent !important; border: 0 !important; }
+        .car-wrap { width: 60px; height: 65px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .car-circle {
+            width: 34px; height: 34px; border-radius: 50%; background: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px; border: 3px solid #2563eb;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+        }
+        .car-circle.me { border-color: #22c55e; }
+        .car-name {
+            margin-top: 2px; padding: 2px 6px; border-radius: 10px;
+            background: rgba(15,23,42,0.92); color: #fff;
+            border: 1px solid rgba(255,255,255,0.14);
+            font-size: 7px; white-space: nowrap; max-width: 50px;
+            overflow: hidden; text-overflow: ellipsis;
+        }
+        .online-count { color: #22c55e; font-weight: 700; }
+        .header-info { display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #94a3b8; }
+        .server-status {
+            font-size: 0.6rem;
+            color: #64748b;
+            margin-top: 8px;
+        }
+        .server-status .connected { color: #22c55e; }
+        .server-status .disconnected { color: #ef4444; }
+    </style>
+</head>
+<body>
+
+    <div id="loginOverlay">
+        <div class="loginCard">
+            <h1>🚗 همیاب</h1>
+            <p>سرور اختصاصی - با کد اتاق</p>
+            <input id="roomInput" placeholder="کد اتاق..." value="family2025">
+            <input id="nameInput" placeholder="نام شما...">
+            <button id="joinBtn">🚀 ورود به نقشه</button>
+            <div class="server-status" id="serverStatus">🔍 در حال اتصال به سرور...</div>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <div class="controls">
+        <button id="myLocationBtn">📍</button>
+        <button id="showAllBtn">👥</button>
+        <button id="zoomInBtn">＋</button>
+        <button id="zoomOutBtn">－</button>
+    </div>
+
+    <div id="usersPanel">
+        <div class="header-info">
+            <span>🚗 اعضای آنلاین</span>
+            <span class="online-count" id="onlineCount">۰</span>
+        </div>
+        <div id="usersList"></div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script>
+        let map, ws, myName, myRoom;
+        const allUsers = {};
+        const userMarkers = {};
+        let watchId = null;
+        let isFirstLocation = true;
+        let reconnectAttempts = 0;
+        let reconnectTimer = null;
+
+        // ===== تشخیص خودکار آدرس سرور =====
+        function getWebSocketUrl() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = window.location.host;
+            // اگر روی پورت 3000 نیست، از پورت فعلی استفاده کن
+            const port = window.location.port || '3000';
+            return `${protocol}//${host}`;
+        }
+
+        const WS_URL = getWebSocketUrl();
+
+        function updateServerStatus(status, isConnected) {
+            const el = document.getElementById('serverStatus');
+            const icon = isConnected ? '🟢' : '🔴';
+            const text = isConnected ? 'متصل' : 'قطع';
+            el.innerHTML = `${icon} سرور: ${status} <span class="${isConnected ? 'connected' : 'disconnected'}">${text}</span>`;
+        }
+
+        function initMap() {
+            map = L.map('map', { zoomControl: false }).setView([35.6892, 51.3890], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '© OpenStreetMap'
+            }).addTo(map);
+        }
+
+        function toast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.style.display = 'block';
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        function userColor(name) {
+            let hash = 0;
+            for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+            return `hsl(${Math.abs(hash) % 360}, 80%, 55%)`;
+        }
+
+        function carIcon(name, isMe = false) {
+            const color = isMe ? '#22c55e' : userColor(name);
+            return L.divIcon({
+                className: 'car-marker',
+                iconSize: [60, 65],
+                iconAnchor: [30, 33],
+                popupAnchor: [0, -30],
+                html: `
+                    <div class="car-wrap">
+                        <div class="car-circle ${isMe ? 'me' : ''}" style="border-color:${color}">🚗</div>
+                        <div class="car-name">${name}</div>
+                    </div>
+                `
+            });
+        }
+
+        function updateUI() {
+            const list = document.getElementById('usersList');
+            const count = document.getElementById('onlineCount');
+            const users = Object.keys(allUsers);
+            count.textContent = users.length;
+            list.innerHTML = users.map(u =>
+                `<span class="user-chip" onclick="goToUser('${u}')">🚗 ${u}</span>`
+            ).join('');
+        }
+
+        function goToUser(name) {
+            const user = allUsers[name];
+            if (user && user.lat && user.lng) {
+                map.setView([user.lat, user.lng], 17, { animate: true });
+                toast('📍 رفتن به ' + name);
+            }
+        }
+
+        function updateMarkers() {
+            for (let name in allUsers) {
+                const user = allUsers[name];
+                if (!user.lat || !user.lng) continue;
+                const isMe = (name === myName);
+                if (!userMarkers[name]) {
+                    const icon = carIcon(name, isMe);
+                    const marker = L.marker([user.lat, user.lng], { icon, zIndexOffset: isMe ? 2000 : 0 }).addTo(map);
+                    marker.bindPopup(`<b>${name}</b>${isMe ? ' (شما)' : ''}`);
+                    userMarkers[name] = marker;
+                } else {
+                    userMarkers[name].setLatLng([user.lat, user.lng]);
+                }
+            }
+            updateUI();
+        }
+
+        function connectWebSocket() {
+            updateServerStatus('در حال اتصال...', false);
+            ws = new WebSocket(WS_URL);
+
+            ws.onopen = () => {
+                updateServerStatus('متصل به سرور', true);
+                toast('🔗 متصل به سرور');
+                reconnectAttempts = 0;
+                if (myName && myRoom) {
+                    ws.send(JSON.stringify({
+                        type: 'join',
+                        roomId: myRoom,
+                        userName: myName
+                    }));
+                }
+                if (!isFirstLocation && watchId === null) {
+                    startGPS();
+                }
+            };
+
+            ws.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+
+                    if (data.type === 'users') {
+                        const newUsers = {};
+                        data.users.forEach(name => {
+                            if (allUsers[name]) {
+                                newUsers[name] = allUsers[name];
+                            } else {
+                                newUsers[name] = { lat: null, lng: null };
+                            }
+                        });
+                        Object.keys(allUsers).forEach(name => {
+                            if (!newUsers[name]) {
+                                delete allUsers[name];
+                                if (userMarkers[name]) {
+                                    map.removeLayer(userMarkers[name]);
+                                    delete userMarkers[name];
+                                }
+                            }
+                        });
+                        Object.assign(allUsers, newUsers);
+                        updateUI();
+                    }
+
+                    if (data.type === 'location') {
+                        allUsers[data.userName] = {
+                            lat: data.lat,
+                            lng: data.lng
+                        };
+                        updateMarkers();
+                    }
+                } catch (e) {
+                    console.log('خطا در پردازش پیام:', e);
+                }
+            };
+
+            ws.onclose = () => {
+                updateServerStatus('قطع شد', false);
+                toast('❌ قطع ارتباط با سرور');
+                if (reconnectAttempts < 10) {
+                    reconnectAttempts++;
+                    const delay = Math.min(5000, 1000 * reconnectAttempts);
+                    clearTimeout(reconnectTimer);
+                    reconnectTimer = setTimeout(() => {
+                        connectWebSocket();
+                    }, delay);
+                }
+            };
+
+            ws.onerror = () => {
+                updateServerStatus('خطا در ارتباط', false);
+                toast('❌ خطا در ارتباط با سرور');
+            };
+        }
+
+        function startGPS() {
+            if (!navigator.geolocation) {
+                toast('❌ GPS در دسترس نیست');
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => {
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+                    if (isFirstLocation) {
+                        map.setView([lat, lng], 15, { animate: true });
+                        isFirstLocation = false;
+                        toast('✅ موقعیت شما ثبت شد');
+                    }
+                    sendLocation(lat, lng);
+                },
+                err => toast('❌ خطا: ' + err.message),
+                { enableHighAccuracy: true, timeout: 15000 }
+            );
+            if (watchId) navigator.geolocation.clearWatch(watchId);
+            watchId = navigator.geolocation.watchPosition(
+                pos => {
+                    sendLocation(pos.coords.latitude, pos.coords.longitude);
+                },
+                err => console.log('GPS:', err),
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        }
+
+        function sendLocation(lat, lng) {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'location',
+                    lat: lat,
+                    lng: lng
+                }));
+            }
+        }
+
+        function showAll() {
+            const points = [];
+            for (let name in allUsers) {
+                const user = allUsers[name];
+                if (user.lat && user.lng) {
+                    points.push([user.lat, user.lng]);
+                }
+            }
+            if (points.length === 0) {
+                toast('👥 هیچ کاربری آنلاین نیست');
+                return;
+            }
+            if (points.length === 1) {
+                map.setView(points[0], 15, { animate: true });
+                return;
+            }
+            map.fitBounds(L.latLngBounds(points), { padding: [50, 50], maxZoom: 16, animate: true });
+        }
+
+        function goToMyLocation() {
+            if (allUsers[myName] && allUsers[myName].lat && allUsers[myName].lng) {
+                map.setView([allUsers[myName].lat, allUsers[myName].lng], 17, { animate: true });
+                toast('📍 رفتن به موقعیت شما');
+            }
+        }
+
+        function joinApp() {
+            const room = document.getElementById('roomInput').value.trim();
+            const name = document.getElementById('nameInput').value.trim();
+            if (!room) { toast('❌ کد اتاق را وارد کن'); return; }
+            if (!name) { toast('❌ نام خود را وارد کن'); return; }
+            if (name.length < 2) { toast('❌ نام حداقل ۲ حرف باشد'); return; }
+
+            myRoom = room;
+            myName = name;
+            document.getElementById('loginOverlay').style.display = 'none';
+            initMap();
+
+            // اتصال به WebSocket
+            connectWebSocket();
+
+            // بعد از اتصال، GPS رو شروع کن
+            setTimeout(() => {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    startGPS();
+                }
+            }, 1000);
+
+            window.addEventListener('beforeunload', () => {
+                if (watchId) navigator.geolocation.clearWatch(watchId);
+                if (ws) ws.close();
+                if (reconnectTimer) clearTimeout(reconnectTimer);
+            });
+        }
+
+        document.getElementById('joinBtn').addEventListener('click', joinApp);
+        document.getElementById('nameInput').addEventListener('keydown', e => { if (e.key === 'Enter') joinApp(); });
+        document.getElementById('myLocationBtn').addEventListener('click', goToMyLocation);
+        document.getElementById('showAllBtn').addEventListener('click', showAll);
+        document.getElementById('zoomInBtn').addEventListener('click', () => map.zoomIn());
+        document.getElementById('zoomOutBtn').addEventListener('click', () => map.zoomOut());
+
+        console.log('🚗 همیاب با سرور WebSocket آماده است!');
+        console.log('🔗 آدرس WebSocket:', WS_URL);
+        console.log('📌 کد اتاق پیش‌فرض: family2025');
+    </script>
+</body>
+</html>
