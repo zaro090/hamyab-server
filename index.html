@@ -5,333 +5,66 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#101827">
 <title>همیاب | نقشه زنده</title>
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vazirmatn@33.0.4/Vazirmatn-font-face.css">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body,#map{width:100%;height:100%;overflow:hidden}
 body{font-family:Vazirmatn,sans-serif;background:#101827;color:#fff}
-
 #map{position:fixed;inset:0}
-
-.panel{
-position:fixed;
-z-index:1000;
-background:rgba(15,23,42,.94);
-backdrop-filter:blur(18px);
-border:1px solid rgba(255,255,255,.1);
-box-shadow:0 10px 35px rgba(0,0,0,.35)
-}
-
-#login{
-position:fixed;
-inset:0;
-z-index:5000;
-display:flex;
-align-items:center;
-justify-content:center;
-padding:20px;
-background:rgba(3,7,18,.96);
-backdrop-filter:blur(20px)
-}
-
-.login-box{
-width:min(400px,100%);
-background:#111827;
-border:1px solid #293548;
-border-radius:30px;
-padding:30px 22px;
-text-align:center;
-box-shadow:0 30px 100px rgba(0,0,0,.65)
-}
-
-.logo{
-width:75px;
-height:75px;
-margin:0 auto 15px;
-border-radius:24px;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:40px;
-background:#f5c542;
-box-shadow:0 12px 35px rgba(245,197,66,.25)
-}
-
-h1{
-font-size:30px;
-color:#f5c542;
-margin-bottom:5px
-}
-
-.login-box p{
-color:#94a3b8;
-font-size:13px;
-line-height:2;
-margin-bottom:20px
-}
-
-input{
-width:100%;
-border:1px solid #334155;
-background:#0b1220;
-color:#fff;
-border-radius:16px;
-padding:15px;
-font-family:inherit;
-font-size:15px;
-text-align:center;
-outline:none
-}
-
+.panel{position:fixed;z-index:1000;background:rgba(15,23,42,.94);backdrop-filter:blur(18px);border:1px solid rgba(255,255,255,.1);box-shadow:0 10px 35px rgba(0,0,0,.35)}
+#login{position:fixed;inset:0;z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(3,7,18,.96);backdrop-filter:blur(20px)}
+.login-box{width:min(400px,100%);background:#111827;border:1px solid #293548;border-radius:30px;padding:30px 22px;text-align:center;box-shadow:0 30px 100px rgba(0,0,0,.65)}
+.logo{width:75px;height:75px;margin:0 auto 15px;border-radius:24px;display:flex;align-items:center;justify-content:center;font-size:40px;background:#f5c542;box-shadow:0 12px 35px rgba(245,197,66,.25)}
+h1{font-size:30px;color:#f5c542;margin-bottom:5px}
+.login-box p{color:#94a3b8;font-size:13px;line-height:2;margin-bottom:20px}
+input{width:100%;border:1px solid #334155;background:#0b1220;color:#fff;border-radius:16px;padding:15px;font-family:inherit;font-size:15px;text-align:center;outline:none}
 input:focus{border-color:#f5c542}
-
-button{
-font-family:inherit;
-border:0;
-cursor:pointer
-}
-
-.join{
-width:100%;
-margin-top:12px;
-padding:15px;
-border-radius:16px;
-background:#f5c542;
-font-weight:800;
-font-size:15px
-}
-
-#top{
-position:fixed;
-top:12px;
-left:12px;
-right:12px;
-z-index:1100;
-display:flex;
-justify-content:space-between;
-align-items:center;
-pointer-events:none
-}
-
-.brand{
-padding:9px 13px;
-border-radius:18px;
-display:flex;
-align-items:center;
-gap:8px;
-pointer-events:auto
-}
-
-.brand-icon{
-width:32px;
-height:32px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:10px;
-background:#f5c542;
-font-size:18px
-}
-
-.brand-name{
-color:#f5c542;
-font-weight:800
-}
-
-.brand-sub{
-font-size:9px;
-color:#94a3b8
-}
-
-.status{
-padding:9px 13px;
-border-radius:18px;
-font-size:11px;
-pointer-events:auto
-}
-
-.dot{
-display:inline-block;
-width:7px;
-height:7px;
-border-radius:50%;
-background:#22c55e;
-margin-left:5px
-}
-
+button{font-family:inherit;border:0;cursor:pointer}
+.join{width:100%;margin-top:12px;padding:15px;border-radius:16px;background:#f5c542;font-weight:800;font-size:15px}
+#top{position:fixed;top:12px;left:12px;right:12px;z-index:1100;display:flex;justify-content:space-between;align-items:center;pointer-events:none}
+.brand{padding:9px 13px;border-radius:18px;display:flex;align-items:center;gap:8px;pointer-events:auto}
+.brand-icon{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#f5c542;font-size:18px}
+.brand-name{color:#f5c542;font-weight:800}
+.brand-sub{font-size:9px;color:#94a3b8}
+.status{padding:9px 13px;border-radius:18px;font-size:11px;pointer-events:auto}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#22c55e;margin-left:5px}
 .status.offline .dot{background:#ef4444}
-
-#controls{
-position:fixed;
-right:12px;
-bottom:155px;
-z-index:1200;
-display:flex;
-flex-direction:column;
-gap:8px
-}
-
-.control{
-width:46px;
-height:46px;
-border-radius:15px;
-background:rgba(15,23,42,.94);
-border:1px solid #334155;
-color:#fff;
-font-size:19px
-}
-
-#users{
-position:fixed;
-bottom:12px;
-left:12px;
-right:12px;
-z-index:1100;
-border-radius:22px;
-overflow:hidden;
-padding:12px
-}
-
-.users-title{
-display:flex;
-justify-content:space-between;
-font-size:12px;
-font-weight:700;
-margin-bottom:8px
-}
-
+#controls{position:fixed;right:12px;bottom:155px;z-index:1200;display:flex;flex-direction:column;gap:8px}
+.control{width:46px;height:46px;border-radius:15px;background:rgba(15,23,42,.94);border:1px solid #334155;color:#fff;font-size:19px}
+#users{position:fixed;bottom:12px;left:12px;right:12px;z-index:1100;border-radius:22px;overflow:hidden;padding:12px}
+.users-title{display:flex;justify-content:space-between;font-size:12px;font-weight:700;margin-bottom:8px}
 .count{color:#22c55e}
-
-#userList{
-display:flex;
-gap:7px;
-overflow-x:auto;
-scrollbar-width:none
-}
-
+#userList{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none}
 #userList::-webkit-scrollbar{display:none}
-
-.user{
-flex:0 0 auto;
-padding:7px 11px;
-background:#1e293b;
-border:1px solid #334155;
-border-radius:14px;
-font-size:10px
-}
-
+.user{flex:0 0 auto;padding:7px 11px;background:#1e293b;border:1px solid #334155;border-radius:14px;font-size:10px}
 .user.me{border-color:#22c55e}
-
-#toast{
-position:fixed;
-top:75px;
-left:50%;
-transform:translateX(-50%);
-z-index:4000;
-display:none;
-background:#111827;
-border:1px solid #f5c542;
-color:#fff;
-padding:9px 16px;
-border-radius:25px;
-font-size:11px;
-white-space:nowrap
-}
-
-.car-marker{
-background:transparent!important;
-border:0!important
-}
-
-.car{
-width:64px;
-height:64px;
-display:flex;
-flex-direction:column;
-align-items:center;
-justify-content:center
-}
-
-.car-icon{
-width:38px;
-height:38px;
-border-radius:50%;
-background:#fff;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:21px;
-border:3px solid #2563eb;
-box-shadow:0 4px 15px rgba(0,0,0,.45)
-}
-
+#toast{position:fixed;top:75px;left:50%;transform:translateX(-50%);z-index:4000;display:none;background:#111827;border:1px solid #f5c542;color:#fff;padding:9px 16px;border-radius:25px;font-size:11px;white-space:nowrap}
+.car-marker{background:transparent!important;border:0!important}
+.car{width:64px;height:64px;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.car-icon{width:38px;height:38px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;border:3px solid #2563eb;box-shadow:0 4px 15px rgba(0,0,0,.45)}
 .car-icon.me{border-color:#22c55e}
-
-.name{
-margin-top:2px;
-max-width:80px;
-overflow:hidden;
-text-overflow:ellipsis;
-white-space:nowrap;
-font-size:8px;
-padding:2px 7px;
-border-radius:10px;
-background:rgba(15,23,42,.94);
-border:1px solid rgba(255,255,255,.12)
-}
-
-#gps{
-position:fixed;
-left:50%;
-transform:translateX(-50%);
-bottom:125px;
-z-index:1000;
-display:none;
-font-size:9px;
-padding:5px 10px;
-border-radius:20px;
-background:rgba(15,23,42,.9);
-color:#cbd5e1
-}
+.name{margin-top:2px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:8px;padding:2px 7px;border-radius:10px;background:rgba(15,23,42,.94);border:1px solid rgba(255,255,255,.12)}
+#gps{position:fixed;left:50%;transform:translateX(-50%);bottom:125px;z-index:1000;display:none;font-size:9px;padding:5px 10px;border-radius:20px;background:rgba(15,23,42,.9);color:#cbd5e1}
+.creator{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);z-index:1200;background:rgba(15,23,42,.9);border:1px solid rgba(255,255,255,.08);padding:6px 16px;border-radius:20px;font-size:10px;color:#94a3b8;white-space:nowrap;backdrop-filter:blur(10px);direction:ltr}
+.creator span.name{color:#f5c542;font-weight:700}
+.creator span.phone{color:#60a5fa}
+.creator span.date{color:#94a3b8}
 </style>
 </head>
-
 <body>
-
 <div id="login">
 <div class="login-box">
-
 <div class="logo">🚗</div>
-
 <h1>همیاب</h1>
-
-<p>
-نقشه زنده خانوادگی<br>
-اعضای آنلاین را روی نقشه ببین
-</p>
-
-<input
-id="nameInput"
-maxlength="30"
-placeholder="نام شما..."
-autocomplete="off">
-
-<button class="join" id="joinBtn">
-🚀 ورود به همیاب
-</button>
-
+<p>نقشه زنده خانوادگی<br>اعضای آنلاین را روی نقشه ببین</p>
+<input id="nameInput" maxlength="30" placeholder="نام شما..." autocomplete="off">
+<button class="join" id="joinBtn">🚀 ورود به همیاب</button>
 </div>
 </div>
-
 <div id="map"></div>
-
 <div id="top">
-
 <div class="panel brand">
 <div class="brand-icon">🚗</div>
 <div>
@@ -339,44 +72,33 @@ autocomplete="off">
 <div class="brand-sub">نقشه زنده خانوادگی</div>
 </div>
 </div>
-
 <div id="status" class="panel status">
 <span class="dot"></span>
 اتصال
 </div>
-
 </div>
-
 <div id="controls">
-
 <button class="control" id="meBtn">📍</button>
 <button class="control" id="allBtn">👥</button>
 <button class="control" id="plusBtn">＋</button>
 <button class="control" id="minusBtn">−</button>
-
 </div>
-
-<div id="gps">
-GPS: <span id="accuracy">--</span> متر
+<div id="gps">GPS: <span id="accuracy">--</span> متر</div>
+<div class="creator">
+<span class="name">👨‍💻 mohammed</span> · 
+<span class="phone">📱 09169044453</span> · 
+<span class="date">📅 1405/06/06</span>
 </div>
-
 <div id="users" class="panel">
-
 <div class="users-title">
 <span>👥 اعضای روی نقشه</span>
 <span class="count" id="count">0 نفر</span>
 </div>
-
 <div id="userList"></div>
-
 </div>
-
 <div id="toast"></div>
-
 <script>
-
 const API = location.origin;
-
 let map;
 let myId;
 let myName;
@@ -384,611 +106,178 @@ let myLat=null;
 let myLng=null;
 let watchId=null;
 let firstGPS=true;
-
 const users={};
 const markers={};
-
 function uid(){
-
 let old=localStorage.getItem("hamyab_id");
-
 if(old)return old;
-
-const id=
-"u_"+Date.now().toString(36)+"_"+
-Math.random().toString(36).slice(2,10);
-
+const id="u_"+Date.now().toString(36)+"_"+Math.random().toString(36).slice(2,10);
 localStorage.setItem("hamyab_id",id);
-
 return id;
 }
-
 function escapeHTML(s){
-
-return String(s)
-.replace(/&/g,"&amp;")
-.replace(/</g,"&lt;")
-.replace(/>/g,"&gt;")
-.replace(/"/g,"&quot;")
-.replace(/'/g,"&#039;");
-
+return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
 }
-
 function toast(text){
-
 const el=document.getElementById("toast");
-
 el.textContent=text;
 el.style.display="block";
-
 clearTimeout(el.timer);
-
-el.timer=setTimeout(()=>{
-el.style.display="none";
-},2500);
-
+el.timer=setTimeout(()=>{ el.style.display="none"; },2500);
 }
-
 function initMap(){
-
-map=L.map("map",{
-zoomControl:false,
-preferCanvas:true
-}).setView([35.6892,51.389],6);
-
-L.tileLayer(
-"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-{
-maxZoom:19,
-attribution:"© OpenStreetMap contributors"
+map=L.map("map",{zoomControl:false,preferCanvas:true}).setView([35.6892,51.389],6);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:19,attribution:"© OpenStreetMap contributors"}).addTo(map);
 }
-).addTo(map);
-
-}
-
 function color(name){
-
 let h=0;
-
-for(let i=0;i<name.length;i++){
-h=name.charCodeAt(i)+((h<<5)-h);
-}
-
+for(let i=0;i<name.length;i++){ h=name.charCodeAt(i)+((h<<5)-h); }
 return `hsl(${Math.abs(h)%360},75%,55%)`;
-
 }
-
 function icon(user){
-
 const me=user.id===myId;
 const c=me?"#22c55e":color(user.name);
-
 return L.divIcon({
-
 className:"car-marker",
-
 iconSize:[64,64],
 iconAnchor:[32,32],
-
 popupAnchor:[0,-30],
-
-html:`
-
-<div class="car">
-
-<div
-class="car-icon ${me?"me":""}"
-style="border-color:${c}">
-🚗
-</div>
-
-<div class="name">
-${escapeHTML(user.name)}
-</div>
-
-</div>
-
-`
-
+html:`<div class="car"><div class="car-icon ${me?"me":""}" style="border-color:${c}">🚗</div><div class="name">${escapeHTML(user.name)}</div></div>`
 });
-
 }
-
 function popup(user){
-
-const acc=
-user.accuracy!=null
-?`<br>🎯 دقت GPS: ${Math.round(user.accuracy)} متر`
-:"";
-
-const me=user.id===myId
-?"<br>🟢 شما"
-:"";
-
-return `
-<strong>${escapeHTML(user.name)}</strong>
-${me}
-<br>🟢 آنلاین
-${acc}
-`;
-
+const acc=user.accuracy!=null?`<br>🎯 دقت GPS: ${Math.round(user.accuracy)} متر`:"";
+const me=user.id===myId?"<br>🟢 شما":"";
+return `<strong>${escapeHTML(user.name)}</strong>${me}<br>🟢 آنلاین${acc}`;
 }
-
 function updateMarker(user){
-
-if(
-typeof user.lat!=="number"||
-typeof user.lng!=="number"
-)return;
-
+if(typeof user.lat!=="number"||typeof user.lng!=="number")return;
 if(!markers[user.id]){
-
-const marker=L.marker(
-[user.lat,user.lng],
-{
-icon:icon(user),
-zIndexOffset:user.id===myId?2000:0
-}
-).addTo(map);
-
+const marker=L.marker([user.lat,user.lng],{icon:icon(user),zIndexOffset:user.id===myId?2000:0}).addTo(map);
 marker.bindPopup(popup(user));
-
 markers[user.id]=marker;
-
 }else{
-
-markers[user.id].setLatLng([
-user.lat,
-user.lng
-]);
-
+markers[user.id].setLatLng([user.lat,user.lng]);
 markers[user.id].setIcon(icon(user));
-
-markers[user.id].setPopupContent(
-popup(user)
-);
-
+markers[user.id].setPopupContent(popup(user));
 }
-
 }
-
-function removeMarker(id){
-
-if(markers[id]){
-
-map.removeLayer(markers[id]);
-delete markers[id];
-
-}
-
-}
-
+function removeMarker(id){ if(markers[id]){ map.removeLayer(markers[id]); delete markers[id]; } }
 function renderUsers(){
-
 const list=document.getElementById("userList");
-
 const arr=Object.values(users);
-
-document.getElementById("count").textContent=
-arr.length+" نفر";
-
+document.getElementById("count").textContent=arr.length+" نفر";
 list.innerHTML="";
-
-arr
-.sort((a,b)=>a.name.localeCompare(b.name,"fa"))
-.forEach(user=>{
-
+arr.sort((a,b)=>a.name.localeCompare(b.name,"fa")).forEach(user=>{
 const el=document.createElement("div");
-
-el.className=
-"user"+(user.id===myId?" me":"");
-
-el.textContent=
-(user.id===myId?"🟢 ":"🚗 ")+user.name;
-
+el.className="user"+(user.id===myId?" me":"");
+el.textContent=(user.id===myId?"🟢 ":"🚗 ")+user.name;
 el.onclick=()=>{
-
-if(
-typeof user.lat==="number"&&
-typeof user.lng==="number"
-){
-
-map.setView(
-[user.lat,user.lng],
-17,
-{animate:true}
-);
-
-if(markers[user.id]){
-markers[user.id].openPopup();
+if(typeof user.lat==="number"&&typeof user.lng==="number"){
+map.setView([user.lat,user.lng],17,{animate:true});
+if(markers[user.id]) markers[user.id].openPopup();
 }
-
-}
-
 };
-
 list.appendChild(el);
-
 });
-
 }
-
 async function sendLocation(){
-
-if(
-myLat===null||
-myLng===null||
-!myId||
-!myName
-)return;
-
+if(myLat===null||myLng===null||!myId||!myName)return;
 try{
-
-await fetch(
-API+"/api/location",
-{
-method:"POST",
-headers:{
-"Content-Type":"application/json"
-},
-body:JSON.stringify({
-
-id:myId,
-name:myName,
-lat:myLat,
-lng:myLng,
-accuracy:window.gpsAccuracy
-
-})
+await fetch(API+"/api/location",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id:myId,name:myName,lat:myLat,lng:myLng,accuracy:window.gpsAccuracy})});
+}catch(e){ console.error(e); }
 }
-);
-
-}catch(e){
-
-console.error(e);
-
-}
-
-}
-
 async function loadUsers(){
-
 try{
-
-const response=
-await fetch(
-API+"/api/users?x="+Date.now(),
-{
-cache:"no-store"
-}
-);
-
-if(!response.ok)
-throw new Error("HTTP "+response.status);
-
+const response=await fetch(API+"/api/users?x="+Date.now(),{cache:"no-store"});
+if(!response.ok) throw new Error("HTTP "+response.status);
 const data=await response.json();
-
 const incoming={};
-
 for(const user of data.users||[]){
-
-if(
-!user.id||
-typeof user.lat!=="number"||
-typeof user.lng!=="number"
-)continue;
-
+if(!user.id||typeof user.lat!=="number"||typeof user.lng!=="number")continue;
 incoming[user.id]=user;
-
 users[user.id]=user;
-
 updateMarker(user);
-
 }
-
-for(const id of Object.keys(users)){
-
-if(!incoming[id]){
-
-delete users[id];
-
-removeMarker(id);
-
-}
-
-}
-
+for(const id of Object.keys(users)){ if(!incoming[id]){ delete users[id]; removeMarker(id); } }
 renderUsers();
-
 document.getElementById("status").classList.remove("offline");
-
-document.getElementById("status").innerHTML=
-'<span class="dot"></span>آنلاین';
-
+document.getElementById("status").innerHTML='<span class="dot"></span>آنلاین';
 }catch(e){
-
 console.error(e);
-
 const status=document.getElementById("status");
-
 status.classList.add("offline");
-
-status.innerHTML=
-'<span class="dot"></span>خطا';
-
+status.innerHTML='<span class="dot"></span>خطا';
 }
-
 }
-
 function gpsSuccess(position){
-
 myLat=position.coords.latitude;
 myLng=position.coords.longitude;
-
-window.gpsAccuracy=
-position.coords.accuracy;
-
+window.gpsAccuracy=position.coords.accuracy;
 document.getElementById("gps").style.display="block";
-
-document.getElementById("accuracy").textContent=
-Math.round(window.gpsAccuracy);
-
-users[myId]={
-
-id:myId,
-name:myName,
-lat:myLat,
-lng:myLng,
-accuracy:window.gpsAccuracy,
-lastSeen:Date.now()
-
-};
-
+document.getElementById("accuracy").textContent=Math.round(window.gpsAccuracy);
+users[myId]={id:myId,name:myName,lat:myLat,lng:myLng,accuracy:window.gpsAccuracy,lastSeen:Date.now()};
 updateMarker(users[myId]);
-
 renderUsers();
-
 sendLocation();
-
 if(firstGPS){
-
-map.setView(
-[myLat,myLng],
-16,
-{animate:true}
-);
-
+map.setView([myLat,myLng],16,{animate:true});
 firstGPS=false;
-
 toast("📍 موقعیت شما ثبت شد");
-
 }
-
 }
-
 function gpsError(error){
-
 console.warn(error);
-
-if(error.code===1){
-
-toast("❌ اجازه GPS داده نشده است");
-
-}else if(error.code===2){
-
-toast("⚠️ موقعیت GPS در دسترس نیست");
-
-}else{
-
-toast("⚠️ دریافت موقعیت طول کشید");
-
+if(error.code===1){ toast("❌ اجازه GPS داده نشده است"); }
+else if(error.code===2){ toast("⚠️ موقعیت GPS در دسترس نیست"); }
+else{ toast("⚠️ دریافت موقعیت طول کشید"); }
 }
-
-}
-
 function startGPS(){
-
-if(!navigator.geolocation){
-
-toast("❌ GPS در مرورگر موجود نیست");
-return;
-
+if(!navigator.geolocation){ toast("❌ GPS در مرورگر موجود نیست"); return; }
+const options={enableHighAccuracy:true,timeout:20000,maximumAge:3000};
+navigator.geolocation.getCurrentPosition(gpsSuccess,gpsError,options);
+watchId=navigator.geolocation.watchPosition(gpsSuccess,gpsError,options);
 }
-
-const options={
-
-enableHighAccuracy:true,
-timeout:20000,
-maximumAge:3000
-
-};
-
-navigator.geolocation.getCurrentPosition(
-gpsSuccess,
-gpsError,
-options
-);
-
-watchId=
-navigator.geolocation.watchPosition(
-gpsSuccess,
-gpsError,
-options
-);
-
-}
-
 function showAll(){
-
 const points=[];
-
 for(const user of Object.values(users)){
-
-if(
-typeof user.lat==="number"&&
-typeof user.lng==="number"
-){
-
-points.push([
-user.lat,
-user.lng
-]);
-
+if(typeof user.lat==="number"&&typeof user.lng==="number"){ points.push([user.lat,user.lng]); }
 }
-
+if(!points.length){ toast("👥 هنوز کاربری روی نقشه نیست"); return; }
+if(points.length===1){ map.setView(points[0],16,{animate:true}); return; }
+map.fitBounds(L.latLngBounds(points),{padding:[80,80],maxZoom:16,animate:true});
 }
-
-if(!points.length){
-
-toast("👥 هنوز کاربری روی نقشه نیست");
-return;
-
-}
-
-if(points.length===1){
-
-map.setView(
-points[0],
-16,
-{animate:true}
-);
-
-return;
-
-}
-
-map.fitBounds(
-L.latLngBounds(points),
-{
-padding:[80,80],
-maxZoom:16,
-animate:true
-}
-);
-
-}
-
 function myLocation(){
-
-if(myLat===null){
-
-toast("⏳ هنوز GPS دریافت نشده");
-return;
-
+if(myLat===null){ toast("⏳ هنوز GPS دریافت نشده"); return; }
+map.setView([myLat,myLng],17,{animate:true});
+if(markers[myId]) markers[myId].openPopup();
 }
-
-map.setView(
-[myLat,myLng],
-17,
-{animate:true}
-);
-
-if(markers[myId])
-markers[myId].openPopup();
-
-}
-
 async function leave(){
-
 if(!myId)return;
-
-try{
-
-await fetch(
-API+"/api/location/"+encodeURIComponent(myId),
-{
-method:"DELETE",
-keepalive:true
+try{ await fetch(API+"/api/location/"+encodeURIComponent(myId),{method:"DELETE",keepalive:true}); }catch(e){}
 }
-);
-
-}catch(e){}
-
-}
-
 function join(){
-
-const input=
-document.getElementById("nameInput");
-
-const name=
-input.value.trim();
-
-if(name.length<2){
-
-toast("❌ نام حداقل ۲ حرف باشد");
-return;
-
-}
-
+const input=document.getElementById("nameInput");
+const name=input.value.trim();
+if(name.length<2){ toast("❌ نام حداقل ۲ حرف باشد"); return; }
 myName=name;
 myId=uid();
-
 document.getElementById("login").style.display="none";
-
 initMap();
-
 startGPS();
-
 loadUsers();
-
 setInterval(loadUsers,3000);
-
 setInterval(sendLocation,5000);
-
 toast("👋 خوش آمدی "+myName);
-
 }
-
-document
-.getElementById("joinBtn")
-.addEventListener("click",join);
-
-document
-.getElementById("nameInput")
-.addEventListener("keydown",e=>{
-
-if(e.key==="Enter")
-join();
-
-});
-
-document
-.getElementById("meBtn")
-.addEventListener("click",myLocation);
-
-document
-.getElementById("allBtn")
-.addEventListener("click",showAll);
-
-document
-.getElementById("plusBtn")
-.addEventListener("click",()=>{
-if(map)map.zoomIn();
-});
-
-document
-.getElementById("minusBtn")
-.addEventListener("click",()=>{
-if(map)map.zoomOut();
-});
-
-window.addEventListener(
-"pagehide",
-leave
-);
-
-window.addEventListener(
-"beforeunload",
-()=>{
-
-if(watchId!==null)
-navigator.geolocation.clearWatch(watchId);
-
-}
-);
-
+document.getElementById("joinBtn").addEventListener("click",join);
+document.getElementById("nameInput").addEventListener("keydown",e=>{ if(e.key==="Enter") join(); });
+document.getElementById("meBtn").addEventListener("click",myLocation);
+document.getElementById("allBtn").addEventListener("click",showAll);
+document.getElementById("plusBtn").addEventListener("click",()=>{ if(map) map.zoomIn(); });
+document.getElementById("minusBtn").addEventListener("click",()=>{ if(map) map.zoomOut(); });
+window.addEventListener("pagehide",leave);
+window.addEventListener("beforeunload",()=>{ if(watchId!==null) navigator.geolocation.clearWatch(watchId); });
 </script>
-
 </body>
 </html>
