@@ -1,179 +1,130 @@
+const http = require("http");
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
+
+const PORT = 3000;
+const HOST = "0.0.0.0";
 const users = new Map();
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-      "Cache-Control": "no-store",
-    },
+function send(res, status, data, type = "application/json; charset=utf-8") {
+  res.writeHead(status, {
+    "Content-Type": type,
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Cache-Control": "no-store"
   });
+  res.end(typeof data === "string" ? data : JSON.stringify(data));
 }
 
 function cleanupUsers() {
   const now = Date.now();
-
   for (const [id, user] of users) {
-    if (now - user.lastSeen > 30000) {
-      users.delete(id);
-    }
+    if (now - user.lastSeen > 30000) users.delete(id);
   }
 }
-
 setInterval(cleanupUsers, 5000);
 
-export default {
-  async fetch(req) {
-    const url = new URL(req.url);
+const server = http.createServer((req, res) => {
+  let url;
+  try {
+    url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
+  } catch {
+    return send(res, 400, { ok: false, error: "آدرس نامعتبر است" });
+  }
 
-    if (req.method === "OPTIONS") {
-      return new Response(null, {
-        status: 204,
-        headers: {
-          "Access-Control-Allow-Origin": "*",
-          "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type",
-          "Access-Control-Max-Age": "86400",
-        },
-      });
-    }
+  if (req.method === "OPTIONS") {
+    res.writeHead(204, {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET,POST,DELETE,OPTIONS",
+      "Access-Control-Allow-Headers": "Content-Type",
+      "Access-Control-Max-Age": "86400"
+    });
+    return res.end();
+  }
 
-    if (req.method === "GET" && url.pathname === "/health") {
-      cleanupUsers();
+  // =========================
+  // HEALTH
+  // =========================
+  if (req.method === "GET" && url.pathname === "/health") {
+    cleanupUsers();
+    return send(res, 200, {
+      ok: true,
+      service: "hamyab",
+      users: users.size,
+      time: new Date().toISOString()
+    });
+  }
 
-      return json({
-        ok: true,
-        service: "hamyab",
-        users: users.size,
-        time: new Date().toISOString(),
-      });
-    }
+  // =========================
+  // USERS
+  // =========================
+  if (req.method === "GET" && url.pathname === "/api/users") {
+    cleanupUsers();
+    return send(res, 200, { ok: true, users: Array.from(users.values()) });
+  }
 
-    if (req.method === "GET" && url.pathname === "/api/users") {
-      cleanupUsers();
-
-      return json({
-        ok: true,
-        users: Array.from(users.values()),
-      });
-    }
-
-    if (req.method === "POST" && url.pathname === "/api/location") {
+  // =========================
+  // LOCATION UPDATE
+  // =========================
+  if (req.method === "POST" && url.pathname === "/api/location") {
+    let body = "";
+    req.on("data", chunk => body += chunk);
+    req.on("end", () => {
       try {
-        const data = await req.json();
-
-        const id =
-          typeof data.id === "string" && data.id.trim()
-            ? data.id.trim().slice(0, 100)
-            : crypto.randomUUID();
-
-        const name =
-          typeof data.name === "string" && data.name.trim()
-            ? data.name.trim().slice(0, 40)
-            : "کاربر";
-
+        const data = JSON.parse(body);
+        const id = typeof data.id === "string" && data.id.trim() ? data.id.trim().slice(0, 100) : crypto.randomUUID();
+        const name = typeof data.name === "string" && data.name.trim() ? data.name.trim().slice(0, 40) : "کاربر";
         const lat = Number(data.lat);
         const lng = Number(data.lng);
-
-        if (
-          !Number.isFinite(lat) ||
-          !Number.isFinite(lng) ||
-          lat < -90 ||
-          lat > 90 ||
-          lng < -180 ||
-          lng > 180
-        ) {
-          return json(
-            {
-              ok: false,
-              error: "مختصات نامعتبر است",
-            },
-            400,
-          );
+        if (!Number.isFinite(lat) || !Number.isFinite(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+          return send(res, 400, { ok: false, error: "مختصات نامعتبر است" });
         }
-
         let accuracy = null;
-
         if (data.accuracy !== null && data.accuracy !== undefined) {
           const n = Number(data.accuracy);
-
-          if (Number.isFinite(n)) {
-            accuracy = Math.max(0, n);
-          }
+          if (Number.isFinite(n)) accuracy = Math.max(0, n);
         }
-
-        const user = {
-          id,
-          name,
-          lat,
-          lng,
-          accuracy,
-          lastSeen: Date.now(),
-        };
-
+        const user = { id, name, lat, lng, accuracy, lastSeen: Date.now() };
         users.set(id, user);
-
-        return json({
-          ok: true,
-          user,
-        });
+        send(res, 200, { ok: true, user });
       } catch {
-        return json(
-          {
-            ok: false,
-            error: "JSON نامعتبر است",
-          },
-          400,
-        );
+        send(res, 400, { ok: false, error: "JSON نامعتبر است" });
       }
-    }
+    });
+    return;
+  }
 
-    if (
-      req.method === "DELETE" &&
-      url.pathname.startsWith("/api/location/")
-    ) {
-      const id = decodeURIComponent(
-        url.pathname.substring("/api/location/".length),
-      );
+  // =========================
+  // REMOVE USER
+  // =========================
+  if (req.method === "DELETE" && url.pathname.startsWith("/api/location/")) {
+    const id = decodeURIComponent(url.pathname.substring("/api/location/".length));
+    users.delete(id);
+    return send(res, 200, { ok: true });
+  }
 
-      users.delete(id);
+  // =========================
+  // MAIN PAGE
+  // =========================
+  if (req.method === "GET" && url.pathname === "/") {
+    const file = path.join(__dirname, "index.html");
+    if (!fs.existsSync(file)) return send(res, 404, { ok: false, error: "index.html پیدا نشد" });
+    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
+    return fs.createReadStream(file).pipe(res);
+  }
 
-      return json({
-        ok: true,
-      });
-    }
+  send(res, 404, { ok: false, error: "Not Found" });
+});
 
-    if (req.method === "GET" && url.pathname === "/") {
-      try {
-        const html = await Deno.readTextFile("./index.html");
-
-        return new Response(html, {
-          status: 200,
-          headers: {
-            "Content-Type": "text/html; charset=utf-8",
-            "Cache-Control": "no-store",
-          },
-        });
-      } catch {
-        return json(
-          {
-            ok: false,
-            error: "index.html پیدا نشد",
-          },
-          404,
-        );
-      }
-    }
-
-    return json(
-      {
-        ok: false,
-        error: "Not Found",
-      },
-      404,
-    );
-  },
-};
+server.listen(PORT, HOST, () => {
+  console.log("");
+  console.log("======================================");
+  console.log("🚗 HAMYAB SERVER");
+  console.log("======================================");
+  console.log(`LOCAL:  http://127.0.0.1:${PORT}`);
+  console.log(`HEALTH: http://127.0.0.1:${PORT}/health`);
+  console.log(`USERS:  http://127.0.0.1:${PORT}/api/users`);
+  console.log("======================================");
+});
