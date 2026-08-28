@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>دیباگ همیاب</title>
+</head>
+<body>
+    <h1>🔍 کاربران آنلاین</h1>
+    <div id="result">⏳ در حال بارگذاری...</div>
+    <script>
+        const API = 'https://hamyab-server-3b0j5z0cw2et.zaro090.deno.net';
+        async function load() {
+            try {
+                const res = await fetch(API + '/api/users?t=' + Date.now());
+                const data = await res.json();
+                const users = data.users || [];
+                document.getElementById('result').innerHTML = `
+                    <p>✅ ${users.length} کاربر آنلاین</p>
+                    <ul>${users.map(u => `<li>🚗 ${u.name} - 📍 ${u.lat}, ${u.lng}</li>`).join('')}</ul>
+                `;
+            } catch(e) {
+                document.getElementById('result').innerHTML = '❌ خطا: ' + e.message;
+            }
+        }
+        load();
+        setInterval(load, 3000);
+    </script>
+</body>
+</html>
